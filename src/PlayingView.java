@@ -139,7 +139,7 @@ public class PlayingView extends JFrame {
 			}
 		} catch(Exception e) {
 			System.out.printf("[Player%d] Round %d: Error\n", turn, round);
-			winner = -2;
+			winner = -2; endGame();
 		}
 	}
 	private void endGame() {

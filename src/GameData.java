@@ -42,6 +42,10 @@ class DataType {
 		this.p0 = p0;
 		this.p1 = p1;
 	}
+	DataType(DataType dataType) {
+		this.p0 = new Point(dataType.p0);
+		this.p1 = new Point(dataType.p1);
+	}
 	public static DataType read(StringTokenizer in) {
 		Point p0 = Point.read(in);
 		Point p1 = Point.read(in);
@@ -112,13 +116,16 @@ public class GameData {
 		map[p.x][p.y] = player + 1;
 	}
 	public static void insert(DataType dataType) {
-		dataList.add(dataType);
+		System.out.println("Insert: " + dataType); dataList.add(new DataType(dataType));
 	}
 	public static void write(BufferedWriter out, boolean first) throws IOException {
 		out.write(String.format("%d\n", round));
+		System.out.println("Write to program: ");
+		System.out.println(String.format("%d", round));
 		for(DataType data: dataList) {
 			if(data.p0.isNull() && !first) continue;
 			out.write(data + "\n");
+			System.out.println(data);
 		}
 	}
 
