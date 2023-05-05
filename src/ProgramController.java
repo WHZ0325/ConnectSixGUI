@@ -1,3 +1,4 @@
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.*;
 
@@ -25,6 +26,7 @@ class ProgramThread extends Thread {
 //			System.out.println("InputStream: " + bufferedReader.readLine());
 			StringTokenizer stringTokenizer = new StringTokenizer(bufferedReader.readLine());
 			data = DataType.read(stringTokenizer);
+			bufferedReader.close();
 
 //			System.out.println("End");
 			success = true;
@@ -35,15 +37,21 @@ class ProgramThread extends Thread {
 		}
 	}
 
-	public boolean success() { return success; }
+	public boolean isSuccess() { return success; }
 	public DataType getData() { return data; }
 }
-public class ProgramController {
+public class ProgramController extends Player {
 	private Process process = null;
-	private DataType operation = null;
-	private boolean success;
-	ProgramController(File file, boolean first) throws Exception {
-//		System.out.println("Program: " + file.getName());
+	private File file;
+	private boolean firstPlayer;
+	ProgramController(File file, boolean firstPlayer) {
+		this.file = file;
+		this.firstPlayer = firstPlayer;
+	}
+
+	@Override
+	public DataType getOperation() throws Exception {
+
 		ProcessBuilder processBuilder = new ProcessBuilder();
 		processBuilder.redirectErrorStream();
 		processBuilder.directory(file.getParentFile());
@@ -59,18 +67,16 @@ public class ProgramController {
 		programThread.start();
 //		System.out.println("Program Thread Start");
 		programThread.join(1000);
-		if(!programThread.success()) {
+		if(!programThread.isSuccess()) {
 			programThread.interrupt();
 			process.destroy();
-			success = false;
+			throw new Exception();
 		}
 		else {
 //			System.out.println("Program Ends.");
 			operation = programThread.getData();
-			success = true;
 		}
+		return operation;
 	}
-	public boolean success() { return success; }
-	public DataType getData() { return operation; }
 
 }

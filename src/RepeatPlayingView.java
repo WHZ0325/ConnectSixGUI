@@ -8,8 +8,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 
-public class PlayingView extends JFrame {
+public class RepeatPlayingView extends JFrame {
+	private int maxRepeatTimes = 100;
+	private int repeatTimes = 0, scores[];
 	private Player players[];
+	//	private File programs[];
 	private JLabel roundLabel = new JLabel("", JLabel.CENTER);
 	private JButton buttons[][];
 	private int winner;
@@ -32,7 +35,7 @@ public class PlayingView extends JFrame {
 		buttons[p.x][p.y].setText(player == 0 ? "B" : "W");
 	}
 	private DataType sharedData;
-	PlayingView(Player player1, Player player2) {
+	RepeatPlayingView(Player player1, Player player2, int maxRepeatTimes) {
 		super("ConnectSix");
 
 		System.out.println(player1.getClass().getSimpleName());
@@ -40,6 +43,9 @@ public class PlayingView extends JFrame {
 
 		players = new Player[2];
 		players[0] = player1; players[1] = player2;
+
+		this.maxRepeatTimes = maxRepeatTimes;
+		scores = new int[2]; repeatTimes = scores[0] = scores[1] = 0;
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
@@ -63,36 +69,6 @@ public class PlayingView extends JFrame {
 					buttons[i][j] = new JButton();
 					buttons[i][j].setBounds((i + 1) * 48, (j + 1) * 48, 48, 48);
 					buttons[i][j].setName(String.format("%d", i * 15 + j));
-					buttons[i][j].addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							int name = Integer.parseInt(((JButton)e.getSource()).getName());
-							System.out.printf("Button %d %d was pressed.\n", name / 15, name % 15);
-							if(GameData.getRound() == 1) {
-								sharedData.p0 = new Point(name / 15, name % 15);
-								place(sharedData.p0, GameData.getCurrentTurn());
-								GameData.insert(sharedData);
-								sharedData.p0.clear(); sharedData.p1.clear();
-								nextRound();
-							}
-							else if(sharedData.p0.isNull()) {
-								sharedData.p0 = new Point(name / 15, name % 15);
-								place(sharedData.p0, GameData.getCurrentTurn());
-								winner = GameData.check();
-								if(winner != -1) {
-									endGame();
-								}
-							}
-							else {
-								sharedData.p1 = new Point(name / 15, name % 15);
-								place(sharedData.p1, GameData.getCurrentTurn());
-								GameData.insert(sharedData);
-								sharedData.p0.clear(); sharedData.p1.clear();
-								nextRound();
-							}
-							enableAllButtons();
-						}
-					});
 					panel.add(buttons[i][j]);
 					++i; ++j;
 				}
@@ -118,49 +94,57 @@ public class PlayingView extends JFrame {
 	public int getWinner() { return this.winner; }
 	private void nextRound() {
 		winner = GameData.check();
-		if(winner != -1) {
-			endGame();
-		}
+		if(winner != -1) return;
 		GameData.nextRound();
 		int round = GameData.getRound(), turn = GameData.getCurrentTurn();
 		roundLabel.setText(String.format("R%d", round));
 		try {
-			DataType data;
-			if(players[turn].getClass().getSimpleName() == "ProgramController") {
-				disableAllButtons();
-				data = players[turn].getOperation();
-				place(data.p0, turn);
-				if(round != 1) place(data.p1, turn);
-				GameData.insert(data);
-				nextRound();
-			}
-			else {
-				enableAllButtons();
-			}
+			DataType data = players[turn].getOperation();
+			place(data.p0, turn);
+			if(round != 1) place(data.p1, turn);
+			GameData.insert(data);
+			nextRound();
 		} catch(Exception e) {
 			System.out.printf("[Player%d] Round %d: Error\n", turn, round);
 			winner = -2;
 		}
 	}
-	private void endGame() {
+	public boolean endGame() {
 		disableAllButtons();
 
 		int winner = getWinner();
 		if(winner < 0 || winner > 2) {
 			JOptionPane.showMessageDialog(null, "There is something wrong with your program.", "ConnectSix - Error", JOptionPane.PLAIN_MESSAGE, null);
-			dispose();
-			System.exit(0);
+			return true;
 		}
 
-		int result = JOptionPane.showConfirmDialog(null, winner > 0 ? String.format("The winner is %s %d\n", players[winner - 1].getClass().getSimpleName() == "ProgramController" ? "Program" : "User", winner) : "The game has drawn.", "ConnectSix - Finished", JOptionPane.OK_CANCEL_OPTION);
-		if(result == JOptionPane.OK_OPTION) {
-			/* 懒。。。 */
-			dispose();
-			System.exit(0);
+		if(repeatTimes < maxRepeatTimes) {
+			++repeatTimes;
+			System.out.printf("%d: Finished.\n", repeatTimes);
+			if(winner == 0) {
+				++scores[0];
+				++scores[1];
+			}
+			else scores[winner - 1] += 2;
+			return false;
 		}
-		else if(result == JOptionPane.CANCEL_OPTION) {
-			dispose();
-			System.exit(0);
+		else {
+			int result = JOptionPane.showConfirmDialog(null, String.format("Player1 won %d scores.(%.2f%%)\nPlayer2 won %d scores.(%.2f%%)\n", scores[0], scores[0] * 100.0 / (scores[0] + scores[1]), scores[1], scores[1] * 100.0 / (scores[0] + scores[1])), "ConnectSix - Finished", JOptionPane.OK_CANCEL_OPTION);
+
+			this.repeatTimes = 0;
+			this.scores[0] = this.scores[1] = 0;
+
+			if(result == JOptionPane.OK_OPTION) {
+				/* 懒。。。 */
+				dispose();
+				System.exit(0);
+//						return false;
+			}
+			else if(result == JOptionPane.CANCEL_OPTION) {
+				dispose();
+				System.exit(0);
+			}
+			return true;
 		}
 	}
 }

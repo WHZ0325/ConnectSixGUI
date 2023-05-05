@@ -12,8 +12,15 @@ class Point {
 		this.x = x;
 		this.y = y;
 	}
+	Point(Point p) {
+		this.x = p.x;
+		this.y = p.y;
+	}
 	public boolean isNull() {
 		return x == -1 && y == -1;
+	}
+	public void clear() {
+		this.x = this.y = -1;
 	}
 	public static Point read(StringTokenizer in) {
 		int x = Integer.parseInt(in.nextToken());
@@ -53,10 +60,7 @@ public class GameData {
 	public static int getCurrentTurn() { return 1 - (round & 1); }
 	private static int getPoint(Point p) { return map[p.x][p.y]; }
 	public static boolean available(Point p) { return getPoint(p) == 0; }
-	private static int lastPlayer = -1;
-	private static Point lastPoint;
 	public static int check() {
-//		System.out.println("check");
 		for(int i = 0; i < 15; ++i) {
 			for(int j = 0; j < 15; ++j) if(!available(new Point(i, j))) {
 				if(i + 5 < 15) {
@@ -104,24 +108,10 @@ public class GameData {
 		return placedCount == 225 ? 0 : -1;
 	}
 	public static void nextRound() { ++round; }
-	public static boolean place(Point p) {
-//		System.out.println("In func: place" + " at (" + p.x + ", " + p.y + ")");
-		int player = getCurrentTurn();
-//		System.out.println("?Player" + (player + 1) + " at (" + p.x + ", " + p.y + ")" + " last " + (lastPlayer + 1));
-		map[p.x][p.y] = player + 1; ++placedCount;
-		if(round == 1) {
-			insert(new DataType(p, new Point(-1, -1)));
-			lastPlayer = player;
-			return true;
-		}
-		else if(player == lastPlayer) {
-			insert(new DataType(lastPoint, p));
-			return true;
-		}
-		lastPoint = p; lastPlayer = player;
-		return false;
+	public static void place(Point p, int player) {
+		map[p.x][p.y] = player + 1;
 	}
-	private static void insert(DataType dataType) {
+	public static void insert(DataType dataType) {
 		dataList.add(dataType);
 	}
 	public static void write(BufferedWriter out, boolean first) throws IOException {

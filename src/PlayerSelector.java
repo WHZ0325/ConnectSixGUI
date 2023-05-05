@@ -5,26 +5,26 @@ import java.awt.event.ActionListener;
 import java.io.*;
 
 public class PlayerSelector extends JComboBox {
-	public PlayerData player;
+	public Player player;
 	private static String s[] = new String[]{ "User", "Program" };
-	PlayerSelector() {
+	PlayerSelector(boolean firstPlayer) {
 		super(s);
-		player = new PlayerData();
+		player = new UserController(firstPlayer);
 		this.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				System.out.println(getSelectedIndex());
-				player.type = (getSelectedIndex() == 0);
-				if(player.type == false) {
+				int selectedIndex = getSelectedIndex();
+				if(selectedIndex == 0) {
+					player = new UserController(firstPlayer);
+				}
+				else if(selectedIndex == 1) {
 					JFileChooser fileChooser = new JFileChooser();
 					fileChooser.showOpenDialog(new JLabel());
 
 					File file = fileChooser.getSelectedFile();
+					player = new ProgramController(file, firstPlayer);
 					System.out.println(file);
-					if(!player.setFile(file)) {
-						setSelectedIndex(0);
-						player.type = false;
-					}
 				}
 			}
 		});

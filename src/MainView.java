@@ -1,37 +1,56 @@
-import java.awt.*;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.*;
 public class MainView extends JFrame {
-	public static PlayerSelector playerSelector1, playerSelector2;
+	private static PlayerSelector playerSelectors[];
 	MainView() {
 		super("ConnectSix");
-		setLayout(new BorderLayout());
 		setSize(384, 96);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JPanel panel = new JPanel();
 
-		panel.add(BorderLayout.CENTER, new JLabel("Player 1: "));
-		playerSelector1 = new PlayerSelector();
-		panel.add(BorderLayout.CENTER, playerSelector1);
-		panel.add(BorderLayout.CENTER, new JLabel("Player 2: "));
-		playerSelector2 = new PlayerSelector();
-		panel.add(BorderLayout.CENTER, playerSelector2);
-		JButton player2 = new JButton("User");
-		add(panel);
+		JLabel label1 = new JLabel("Player 1: ");
+		panel.add(label1);
+		playerSelectors = new PlayerSelector[2];
+		playerSelectors[0] = new PlayerSelector(true);
+		panel.add(playerSelectors[0]);
+		JLabel label2 = new JLabel("Player 2: ");
+		panel.add(label2);
+		playerSelectors[1] = new PlayerSelector(false);
+		panel.add(playerSelectors[1]);
 
 		JButton confirmButton = new JButton("Confirm");
 		confirmButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				dispose();
-				PlayingView playingView = new PlayingView(playerSelector1.player, playerSelector2.player);
+				PlayingView playingView = new PlayingView(playerSelectors[0].player, playerSelectors[1].player);
+				playingView.startGame();
 			}
 		});
-		add(BorderLayout.SOUTH, confirmButton);
+		panel.add(confirmButton);
 
+		JButton repeatButton = new JButton("Repeat");
+		repeatButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(playerSelectors[0].getSelectedIndex() == 1 && playerSelectors[1].getSelectedIndex() == 1) {
+					dispose();
+					RepeatPlayingView repeatplayingView = new RepeatPlayingView(playerSelectors[0].player, playerSelectors[1].player, 100);
+					while(!repeatplayingView.endGame()) {
+						repeatplayingView.startGame();
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "You have to choose two programs to compete.", "ConnectSix - Warning", JOptionPane.PLAIN_MESSAGE);
+				}
+			}
+		});
+		panel.add(repeatButton);
+
+		add(panel);
 		setVisible(true);
 	}
 	public static void main(String[] args) {
