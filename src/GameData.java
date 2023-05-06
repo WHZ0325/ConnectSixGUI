@@ -116,16 +116,17 @@ public class GameData {
 		map[p.x][p.y] = player + 1;
 	}
 	public static void insert(DataType dataType) {
-		System.out.println("Insert: " + dataType); dataList.add(new DataType(dataType));
+		System.out.println("Insert: " + dataType);
+		dataList.add(new DataType(dataType));
 	}
 	public static void write(BufferedWriter out, boolean first) throws IOException {
-		out.write(String.format("%d\n", round));
-		System.out.println("Write to program: ");
-		System.out.println(String.format("%d", round));
+		out.write(String.format("%d\n", (round + 1) >> 1));
+//		System.out.println("Write to program: ");
+//		System.out.println(String.format("%d", (round + 1) >> 1));
 		for(DataType data: dataList) {
 			if(data.p0.isNull() && !first) continue;
 			out.write(data + "\n");
-			System.out.println(data);
+//			System.out.println(data);
 		}
 	}
 

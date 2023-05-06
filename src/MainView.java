@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class MainView extends JFrame {
+	private static int repeatTimes = 5;
 	private static PlayerSelector playerSelectors[];
 	MainView() {
 		super("ConnectSix");
@@ -38,7 +39,8 @@ public class MainView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(playerSelectors[0].getSelectedIndex() == 1 && playerSelectors[1].getSelectedIndex() == 1) {
 					dispose();
-					RepeatPlayingView repeatplayingView = new RepeatPlayingView(playerSelectors[0].player, playerSelectors[1].player, 100);
+					RepeatPlayingView repeatplayingView = new RepeatPlayingView(playerSelectors[0].player, playerSelectors[1].player, repeatTimes);
+					repeatplayingView.startGame();
 					while(!repeatplayingView.endGame()) {
 						repeatplayingView.startGame();
 					}
@@ -54,6 +56,9 @@ public class MainView extends JFrame {
 		setVisible(true);
 	}
 	public static void main(String[] args) {
+		if(args.length >= 1) {
+			repeatTimes = Integer.parseInt(args[0]);
+		}
 		MainView mainView = new MainView();
 	}
 }

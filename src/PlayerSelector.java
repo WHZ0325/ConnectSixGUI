@@ -13,7 +13,7 @@ public class PlayerSelector extends JComboBox {
 		this.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(getSelectedIndex());
+//				System.out.println(getSelectedIndex());
 				int selectedIndex = getSelectedIndex();
 				if(selectedIndex == 0) {
 					player = new UserController(firstPlayer);

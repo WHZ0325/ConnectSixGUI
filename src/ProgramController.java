@@ -6,9 +6,11 @@ class ProgramThread extends Thread {
 	private Process process;
 	private DataType data;
 	private boolean success;
-	ProgramThread(Process process) {
+	private boolean firstPlayer;
+	ProgramThread(Process process, boolean firstPlayer) {
 		this.process = process;
 		this.success = false;
+		this.firstPlayer = firstPlayer;
 	}
 	@Override
 	public void run() {
@@ -17,7 +19,7 @@ class ProgramThread extends Thread {
 //			System.out.println("Write");
 //			System.out.println(process.getOutputStream());
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-			GameData.write(out, true);
+			GameData.write(out, firstPlayer);
 			out.close();
 
 //			System.out.println("Read");
@@ -63,7 +65,7 @@ public class ProgramController extends Player {
 		}
 		process = processBuilder.start();
 //		System.out.println("ProcessBuilder Start");
-		ProgramThread programThread = new ProgramThread(process);
+		ProgramThread programThread = new ProgramThread(process, firstPlayer);
 		programThread.start();
 //		System.out.println("Program Thread Start");
 		programThread.join(1000);

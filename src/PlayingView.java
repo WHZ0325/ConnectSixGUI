@@ -35,8 +35,8 @@ public class PlayingView extends JFrame {
 	PlayingView(Player player1, Player player2) {
 		super("ConnectSix");
 
-		System.out.println(player1.getClass().getSimpleName());
-		System.out.println(player2.getClass().getSimpleName());
+//		System.out.println(player1.getClass().getSimpleName());
+//		System.out.println(player2.getClass().getSimpleName());
 
 		players = new Player[2];
 		players[0] = player1; players[1] = player2;
@@ -152,15 +152,8 @@ public class PlayingView extends JFrame {
 			System.exit(0);
 		}
 
-		int result = JOptionPane.showConfirmDialog(null, winner > 0 ? String.format("The winner is %s %d\n", players[winner - 1].getClass().getSimpleName() == "ProgramController" ? "Program" : "User", winner) : "The game has drawn.", "ConnectSix - Finished", JOptionPane.OK_CANCEL_OPTION);
-		if(result == JOptionPane.OK_OPTION) {
-			/* 懒。。。 */
-			dispose();
-			System.exit(0);
-		}
-		else if(result == JOptionPane.CANCEL_OPTION) {
-			dispose();
-			System.exit(0);
-		}
+		int result = JOptionPane.showConfirmDialog(null, winner > 0 ? String.format("The winner is %s %d\n", players[winner - 1].getClass().getSimpleName() == "ProgramController" ? "Program" : "User", winner) : "The game has drawn.", "ConnectSix - Finished", JOptionPane.PLAIN_MESSAGE);
+		dispose();
+		System.exit(0);
 	}
 }

@@ -38,8 +38,8 @@ public class RepeatPlayingView extends JFrame {
 	RepeatPlayingView(Player player1, Player player2, int maxRepeatTimes) {
 		super("ConnectSix");
 
-		System.out.println(player1.getClass().getSimpleName());
-		System.out.println(player2.getClass().getSimpleName());
+//		System.out.println(player1.getClass().getSimpleName());
+//		System.out.println(player2.getClass().getSimpleName());
 
 		players = new Player[2];
 		players[0] = player1; players[1] = player2;
@@ -118,33 +118,23 @@ public class RepeatPlayingView extends JFrame {
 			return true;
 		}
 
-		if(repeatTimes < maxRepeatTimes) {
-			++repeatTimes;
-			System.out.printf("%d: Finished.\n", repeatTimes);
-			if(winner == 0) {
-				++scores[0];
-				++scores[1];
-			}
-			else scores[winner - 1] += 2;
-			return false;
+		System.out.printf("%d: Finished.\n", ++repeatTimes);
+		if(winner == 0) {
+			++scores[0];
+			++scores[1];
 		}
-		else {
-			int result = JOptionPane.showConfirmDialog(null, String.format("Player1 won %d scores.(%.2f%%)\nPlayer2 won %d scores.(%.2f%%)\n", scores[0], scores[0] * 100.0 / (scores[0] + scores[1]), scores[1], scores[1] * 100.0 / (scores[0] + scores[1])), "ConnectSix - Finished", JOptionPane.OK_CANCEL_OPTION);
+		else scores[winner - 1] += 2;
+		System.out.printf("Score %d %d.\n", scores[0], scores[1]);
+		if(repeatTimes == maxRepeatTimes) {
+			int result = JOptionPane.showConfirmDialog(null, String.format("Player1 won %d scores.(%.2f%%)\nPlayer2 won %d scores.(%.2f%%)\n", scores[0], scores[0] * 100.0 / (scores[0] + scores[1]), scores[1], scores[1] * 100.0 / (scores[0] + scores[1])), "ConnectSix - Finished", JOptionPane.PLAIN_MESSAGE);
 
 			this.repeatTimes = 0;
 			this.scores[0] = this.scores[1] = 0;
 
-			if(result == JOptionPane.OK_OPTION) {
-				/* 懒。。。 */
-				dispose();
-				System.exit(0);
-//						return false;
-			}
-			else if(result == JOptionPane.CANCEL_OPTION) {
-				dispose();
-				System.exit(0);
-			}
+			dispose();
+			System.exit(0);
 			return true;
 		}
+		return false;
 	}
 }
